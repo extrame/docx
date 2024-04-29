@@ -1,4 +1,4 @@
-package docxlib
+package docx
 
 import (
 	"archive/zip"

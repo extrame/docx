@@ -1,4 +1,4 @@
-package docxlib
+package docx
 
 // This contains internal functions needed to unpack (read) a zip file
 import (
@@ -6,7 +6,7 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 
-	"github.com/golang/glog"
+	"github.com/sirupsen/logrus"
 )
 
 // This receives a zip file (word documents are a zip with multiple xml inside)
@@ -29,22 +29,52 @@ func unpack(zipReader *zip.Reader) (docx *DocxLib, err error) {
 				return nil, err
 			}
 		}
+		if f.Name == "word/styles.xml" {
+			styles, err := processStyles(f)
+			if err != nil {
+				return nil, err
+			}
+			doc.Styles = styles
+		}
 	}
 	docx = &DocxLib{
 		Document:    *doc,
 		DocRelation: *relations,
 	}
+	for _, para := range doc.Body.Paragraphs {
+		para.file = docx
+	}
 	return docx, nil
+}
+
+func processStyles(file *zip.File) (*DocumentStyle, error) {
+	filebytes, err := readZipFile(file)
+	if err != nil {
+		logrus.Errorln("Error reading from internal zip file")
+		return nil, err
+	}
+	logrus.Errorln("Doc:", string(filebytes))
+
+	doc := DocumentStyle{
+		XMLW:    XMLNS_W,
+		XMLR:    XMLNS_R,
+		XMLName: xml.Name{Space: XMLNS_W, Local: "styles"}}
+	err = xml.Unmarshal(filebytes, &doc)
+	if err != nil {
+		logrus.Errorln("Error unmarshalling doc style", string(filebytes))
+		return nil, err
+	}
+	return &doc, nil
 }
 
 // Processes one of the relevant files, the one with the actual document
 func processDoc(file *zip.File) (*Document, error) {
 	filebytes, err := readZipFile(file)
 	if err != nil {
-		glog.Errorln("Error reading from internal zip file")
+		logrus.Errorln("Error reading from internal zip file")
 		return nil, err
 	}
-	glog.V(0).Infoln("Doc:", string(filebytes))
+	logrus.Errorln("Doc:", string(filebytes))
 
 	doc := Document{
 		XMLW:    XMLNS_W,
@@ -52,10 +82,10 @@ func processDoc(file *zip.File) (*Document, error) {
 		XMLName: xml.Name{Space: XMLNS_W, Local: "document"}}
 	err = xml.Unmarshal(filebytes, &doc)
 	if err != nil {
-		glog.Errorln("Error unmarshalling doc", string(filebytes))
+		logrus.Errorln("Error unmarshalling doc", string(filebytes))
 		return nil, err
 	}
-	glog.V(0).Infoln("Paragraph", doc.Body.Paragraphs)
+	logrus.Debugln("Paragraph", doc.Body.Paragraphs)
 	return &doc, nil
 }
 
@@ -63,15 +93,15 @@ func processDoc(file *zip.File) (*Document, error) {
 func processRelations(file *zip.File) (*Relationships, error) {
 	filebytes, err := readZipFile(file)
 	if err != nil {
-		glog.Errorln("Error reading from internal zip file")
+		logrus.Errorln("Error reading from internal zip file")
 		return nil, err
 	}
-	glog.V(0).Infoln("Relations:", string(filebytes))
+	logrus.Errorln("Relations:", string(filebytes))
 
 	rels := Relationships{Xmlns: XMLNS_R}
 	err = xml.Unmarshal(filebytes, &rels)
 	if err != nil {
-		glog.Errorln("Error unmarshalling relationships")
+		logrus.Errorln("Error unmarshalling relationships")
 		return nil, err
 	}
 	return &rels, nil

@@ -1,9 +1,9 @@
-package docxlib
+package docx
 
 // AddParagraph adds a new paragraph
 func (f *DocxLib) AddParagraph() *Paragraph {
 	p := &Paragraph{
-		Data: make([]ParagraphChild, 0),
+		// Data: make([]ParagraphChild, 0),
 		file: f,
 	}
 
@@ -12,9 +12,12 @@ func (f *DocxLib) AddParagraph() *Paragraph {
 }
 
 func (f *DocxLib) Paragraphs() []*Paragraph {
-	return f.Document.Body.Paragraphs
+	return f.
+		Document.
+		Body.
+		Paragraphs
 }
 
-func (p *Paragraph) Children() (ret []ParagraphChild) {
-	return p.Data
-}
+// func (p *Paragraph) Children() (ret []ParagraphChild) {
+// 	return p.Data
+// }

@@ -1,8 +1,7 @@
-package docxlib
+package docx
 
 import (
 	"encoding/xml"
-	"io"
 )
 
 const (
@@ -16,6 +15,7 @@ type Run struct {
 	RunProperties *RunProperties `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rPr,omitempty"`
 	InstrText     string         `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main instrText,omitempty"`
 	Text          *Text
+	no            int
 }
 
 // The Text object contains the actual text
@@ -29,134 +29,62 @@ type Text struct {
 type Hyperlink struct {
 	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main hyperlink,omitempty"`
 	ID      string   `xml:"http://schemas.openxmlformats.org/officeDocument/2006/relationships id,attr"`
-	Run     Run
+	Run     Run      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main r,omitempty"`
+	no      int
 }
 
 // RunProperties encapsulates visual properties of a run
 type RunProperties struct {
-	XMLName  xml.Name  `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rPr,omitempty"`
-	Color    *Color    `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main color,omitempty"`
-	Size     *Size     `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main sz,omitempty"`
-	RunStyle *RunStyle `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rStyle,omitempty"`
-	Style    *Style    `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
+	XMLName  xml.Name      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rPr,omitempty"`
+	Color    *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main color,omitempty"`
+	Size     *IntValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main sz,omitempty"`
+	RunStyle *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rStyle,omitempty"`
+	Style    *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
+	Fonts    *Fonts        `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rFonts,omitempty"`
 }
 
-// RunStyle contains styling for a run
-type RunStyle struct {
-	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rStyle,omitempty"`
-	Val     string   `xml:"w:val,attr"`
-}
-
-// Style contains styling for a paragraph
-type Style struct {
-	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
-	Val     string   `xml:"w:val,attr"`
-}
-
-// Color contains the sound of music. :D
-// I'm kidding. It contains the color
-type Color struct {
-	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main color"`
-	Val     string   `xml:"w:val,attr"`
+// Fonts contains the font family
+type Fonts struct {
+	XMLName  xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main rFonts,omitempty"`
+	Ascii    string   `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main ascii,attr"`
+	HAnsi    string   `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main hAnsi,attr"`
+	EastAsia string   `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main eastAsia,attr"`
+	Complex  string   `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main complex,attr"`
+	Cs       string   `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main cs,attr"`
 }
 
 // Size contains the font size
-type Size struct {
-	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main sz"`
-	Val     int      `xml:"w:val,attr"`
+
+type ParagraphProperties struct {
+	XMLName xml.Name      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr,omitempty"`
+	Style   *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
+	Spacing *Spacing      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main spacing,omitempty"`
+	Ind     *Indent       `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main ind,omitempty"`
+	Jc      *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main jc,omitempty"`
 }
 
-func (r *Run) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var elem Run
-	for {
-		t, err := d.Token()
-		if err == io.EOF {
-			break
-		}
-
-		switch tt := t.(type) {
-		case xml.StartElement:
-			if tt.Name.Local == "rPr" {
-				var value RunProperties
-				d.DecodeElement(&value, &start)
-				elem.RunProperties = &value
-			} else if tt.Name.Local == "instrText" {
-				var value string
-				d.DecodeElement(&value, &start)
-				elem.InstrText = value
-			} else if tt.Name.Local == "t" {
-				var value Text
-				d.DecodeElement(&value, &start)
-				elem.Text = &value
-			} else {
-				continue
-			}
-		}
-
+func (p *ParagraphProperties) GetStyleId() string {
+	if p.Style != nil {
+		return p.Style.Val
 	}
-	*r = elem
-
-	return nil
-
+	return ""
 }
-func (r *Text) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var elem Text
-	for {
-		t, err := d.Token()
-		if err == io.EOF {
-			break
-		}
 
-		switch tt := t.(type) {
-		case xml.CharData:
-			cd := tt.Copy()
-			elem.Text = string(cd)
-		}
-
-	}
-
-	*r = elem
-	return nil
+type Indent struct {
+	XMLName    xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main ind,omitempty"`
+	First      int      `xml:"http://schemas.openxmlformats.org/2006/main first,attr"`
+	Hanging    int      `xml:"http://schemas.openxmlformats.org/2006/main hanging,attr"`
+	Left       int      `xml:"http://schemas.openxmlformats.org/2006/main left,attr"`
+	Right      int      `xml:"http://schemas.openxmlformats.org/2006/main right,attr"`
+	LeftChars  int      `xml:"http://schemas.openxmlformats.org/2006/main leftChars,attr"`
+	RightChars int      `xml:"http://schemas.openxmlformats.org/2006/main rightChars,attr"`
 }
-func (r *Hyperlink) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var elem Hyperlink
-	for {
-		t, err := d.Token()
-		if err == io.EOF {
-			break
-		}
 
-		switch tt := t.(type) {
-		case xml.StartElement:
-			if tt.Name.Local == "r" {
-				d.DecodeElement(&elem.Run, &start)
-			} else {
-				continue
-			}
-		}
-
-	}
-	*r = elem
-	return nil
-
-}
-func (r *RunStyle) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var elem RunStyle
-	for {
-		t, err := d.Token()
-		if err == io.EOF {
-			break
-		}
-
-		switch tt := t.(type) {
-		case xml.StartElement:
-			elem.Val = getAtt(tt.Attr, "val")
-		}
-
-	}
-	*r = elem
-	return nil
-
+type Spacing struct {
+	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main spacing,omitempty"`
+	After   int      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main after,attr"`
+	Before  int      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main before,attr"`
+	Line    int      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main line,attr"`
 }
 
 func getAtt(atts []xml.Attr, name string) string {

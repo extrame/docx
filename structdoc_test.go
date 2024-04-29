@@ -1,4 +1,4 @@
-package docxlib
+package docx
 
 import (
 	"encoding/xml"
@@ -32,21 +32,22 @@ func TestStructure(t *testing.T) {
 				NUM_PARAGRAPHS, len(doc.Body.Paragraphs))
 		}
 		for _, p := range doc.Body.Paragraphs {
-			if len(p.Children()) == 0 {
-				t.Errorf("We were not able to parse paragraph %v",
-					p)
-			}
-			for _, child := range p.Children() {
-				if child.Link == nil && child.Properties == nil && child.Run == nil {
-					t.Errorf("There are Paragraph children with all fields nil")
-				}
-				if child.Run != nil && child.Run.Text == nil && child.Run.InstrText == "" {
-					t.Errorf("We have a run with no text")
-				}
-				if child.Link != nil && child.Link.ID == "" {
-					t.Errorf("We have a link without ID")
-				}
-			}
+			t.Error(p)
+			// if len(p.Children()) == 0 {
+			// 	t.Errorf("We were not able to parse paragraph %v",
+			// 		p)
+			// }
+			// for _, child := range p.Children() {
+			// 	if child.Link == nil && child.Properties == nil && child.Run == nil {
+			// 		t.Errorf("There are Paragraph children with all fields nil")
+			// 	}
+			// 	if child.Run != nil && child.Run.Text == nil && child.Run.InstrText == "" {
+			// 		t.Errorf("We have a run with no text")
+			// 	}
+			// 	if child.Link != nil && child.Link.ID == "" {
+			// 		t.Errorf("We have a link without ID")
+			// 	}
+			// }
 		}
 	}
 }

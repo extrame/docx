@@ -1,4 +1,4 @@
-package docxlib
+package docx
 
 import "strconv"
 
@@ -25,7 +25,7 @@ func (p *Paragraph) AddLink(text string, link string) *Hyperlink {
 		ID: rId,
 		Run: Run{
 			RunProperties: &RunProperties{
-				RunStyle: &RunStyle{
+				RunStyle: &StrValueNode{
 					Val: HYPERLINK_STYLE,
 				},
 			},
@@ -33,7 +33,7 @@ func (p *Paragraph) AddLink(text string, link string) *Hyperlink {
 		},
 	}
 
-	p.Data = append(p.Data, ParagraphChild{Link: hyperlink})
+	// p.Data = append(p.Data, ParagraphChild{Link: hyperlink})
 
 	return hyperlink
 }

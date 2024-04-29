@@ -1,4 +1,4 @@
-package docxlib
+package docx
 
 import (
 	"archive/zip"
@@ -15,6 +15,10 @@ type DocxLib struct {
 	rId int
 }
 
+func (d *DocxLib) GetStyleById(styleId string) *DefinedStyle {
+	return d.Document.Styles.GetStyleById(styleId)
+}
+
 // New generates a new empty docx file that we can manipulate and
 // later on, save
 func New() *DocxLib {
@@ -23,16 +27,18 @@ func New() *DocxLib {
 
 // Parse generates a new docx file in memory from a reader
 // You can it invoke from a file
-//		readFile, err := os.Open(FILE_PATH)
-//		if err != nil {
-//			panic(err)
-//		}
-//		fileinfo, err := readFile.Stat()
-//		if err != nil {
-//			panic(err)
-//		}
-//		size := fileinfo.Size()
-//		doc, err := docxlib.Parse(readFile, int64(size))
+//
+//	readFile, err := os.Open(FILE_PATH)
+//	if err != nil {
+//		panic(err)
+//	}
+//	fileinfo, err := readFile.Stat()
+//	if err != nil {
+//		panic(err)
+//	}
+//	size := fileinfo.Size()
+//	doc, err := docx.Parse(readFile, int64(size))
+//
 // but also you can invoke from a webform (BEWARE of trusting users data!!!)
 //
 //	func uploadFile(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +52,7 @@ func New() *DocxLib {
 //			return
 //		}
 //		defer file.Close()
-//		docxlib.Parse(file, handler.Size)
+//		docx.Parse(file, handler.Size)
 //	}
 func Parse(reader io.ReaderAt, size int64) (doc *DocxLib, err error) {
 	zipReader, err := zip.NewReader(reader, size)
