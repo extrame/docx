@@ -53,7 +53,6 @@ func processStyles(file *zip.File) (*DocumentStyle, error) {
 		logrus.Errorln("Error reading from internal zip file")
 		return nil, err
 	}
-	logrus.Errorln("Doc:", string(filebytes))
 
 	doc := DocumentStyle{
 		XMLW:    XMLNS_W,

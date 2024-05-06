@@ -72,7 +72,6 @@ func Trans(name string, doc *docx.DocxFile, dest string, fontFile ...string) err
 	}
 
 parsing:
-
 	pdf.AddPage()
 	pdf.SetY(10)
 	pdf.SetX(10)

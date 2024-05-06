@@ -15,6 +15,9 @@ type Paragraph struct {
 }
 
 func (p *Paragraph) GetStyle() *DefinedStyle {
+	if p.Properties == nil {
+		return nil
+	}
 	var styleId = p.Properties.GetStyleId()
 	return p.
 		file.
@@ -55,7 +58,7 @@ func (p *Paragraph) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 				value.no = itemCount
 				itemCount++
 				elem.Runs = append(elem.Runs, &value)
-				logrus.Info("Run: ", value, err)
+				logrus.Debug("Run: ", value, err)
 			} else if tt.Name.Local == "hyperlink" {
 				var value Hyperlink
 				d.DecodeElement(&value, &tt)
