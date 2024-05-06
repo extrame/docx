@@ -23,8 +23,8 @@ func emptyRelationships() []*Relationship {
 	return defaultRel
 }
 
-func emptyFile() *DocxLib {
-	docx := &DocxLib{
+func emptyFile() *DocxFile {
+	docx := &DocxFile{
 		Document: Document{
 			XMLName: xml.Name{
 				Space: "w",

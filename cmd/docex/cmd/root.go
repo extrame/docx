@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -15,21 +16,21 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "docex",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "docex command for reading/transformating docx files",
+	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		if verbose {
 			logrus.SetLevel(logrus.DebugLevel)
 		}
+		if len(args) == 0 {
+			cmd.PrintErr("Please provide a docx file path")
+			return errors.New("no docx file path")
+		}
+		return nil
 	},
 }
 

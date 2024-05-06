@@ -11,7 +11,7 @@ type Paragraph struct {
 	Properties *ParagraphProperties
 	Links      []*Hyperlink `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main hyperlink,omitempty"`
 	Runs       []*Run       `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main r,omitempty"`
-	file       *DocxLib
+	file       *DocxFile
 }
 
 func (p *Paragraph) GetStyle() *DefinedStyle {

@@ -13,7 +13,7 @@ import (
 // and parses the files that are relevant for us:
 // 1.-Document
 // 2.-Relationships
-func unpack(zipReader *zip.Reader) (docx *DocxLib, err error) {
+func unpack(zipReader *zip.Reader) (docx *DocxFile, err error) {
 	var doc *Document
 	var relations *Relationships
 	for _, f := range zipReader.File {
@@ -37,7 +37,7 @@ func unpack(zipReader *zip.Reader) (docx *DocxLib, err error) {
 			doc.Styles = styles
 		}
 	}
-	docx = &DocxLib{
+	docx = &DocxFile{
 		Document:    *doc,
 		DocRelation: *relations,
 	}

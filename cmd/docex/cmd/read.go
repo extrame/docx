@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	docx "github.com/extrame/docx"
 	"github.com/spf13/cobra"
@@ -17,22 +16,10 @@ var readCmd = &cobra.Command{
 	Short: "Read a docx file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			cmd.PrintErr("Please provide a docx file path")
+		doc, err := docx.Open(args[0])
+		if err != nil {
+			cmd.PrintErr(err)
 			return
-		}
-		readFile, err := os.Open(args[0])
-		if err != nil {
-			cmd.PrintErr(err)
-		}
-		fileinfo, err := readFile.Stat()
-		if err != nil {
-			cmd.PrintErr(err)
-		}
-		size := fileinfo.Size()
-		doc, err := docx.Parse(readFile, int64(size))
-		if err != nil {
-			cmd.PrintErr(err)
 		}
 		for _, para := range doc.Paragraphs() {
 
