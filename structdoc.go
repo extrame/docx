@@ -63,13 +63,8 @@ type RPrDefault struct {
 }
 
 type PPrDefault struct {
-	XMLName xml.Name       `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPrDefault"`
-	PPr     *ParagraphProp `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr"`
-}
-
-type ParagraphProp struct {
-	XMLName xml.Name      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr"`
-	Style   *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
+	XMLName xml.Name             `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPrDefault"`
+	PPr     *ParagraphProperties `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr"`
 }
 
 type LatentStyles struct {

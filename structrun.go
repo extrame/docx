@@ -56,11 +56,12 @@ type Fonts struct {
 // Size contains the font size
 
 type ParagraphProperties struct {
-	XMLName xml.Name      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr,omitempty"`
+	XMLName xml.Name      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pPr"`
 	Style   *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main pStyle,omitempty"`
 	Spacing *Spacing      `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main spacing,omitempty"`
 	Ind     *Indent       `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main ind,omitempty"`
 	Jc      *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main jc,omitempty"`
+	Outline *StrValueNode `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main outlineLvl,omitempty"`
 }
 
 func (p *ParagraphProperties) GetStyleId() string {

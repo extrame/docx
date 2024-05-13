@@ -2,6 +2,7 @@ package docx
 
 import (
 	"encoding/xml"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 )
@@ -24,6 +25,21 @@ func (p *Paragraph) GetStyle() *DefinedStyle {
 		Document.
 		Styles.
 		GetStyleById(styleId)
+}
+
+func (p *Paragraph) GetOutlineLevel() int {
+	if p.Properties == nil {
+		return 0
+	}
+	if p.Properties.Outline == nil {
+		return 0
+	}
+	level, err := strconv.Atoi(p.Properties.Outline.Val)
+	if err != nil {
+		logrus.Error("Error parsing outline level: ", err)
+		return 0
+	}
+	return level
 }
 
 func (p *Paragraph) Text() string {
