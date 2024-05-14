@@ -27,12 +27,13 @@ func (p *Paragraph) GetStyle() *DefinedStyle {
 		GetStyleById(styleId)
 }
 
+// GetOutlineLevel returns the outline level of the paragraph,if it is not set, it returns -1
 func (p *Paragraph) GetOutlineLevel() int {
 	if p.Properties == nil {
 		return 0
 	}
 	if p.Properties.Outline == nil {
-		return 0
+		return -1
 	}
 	level, err := strconv.Atoi(p.Properties.Outline.Val)
 	if err != nil {

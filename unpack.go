@@ -73,7 +73,7 @@ func processDoc(file *zip.File) (*Document, error) {
 		logrus.Errorln("Error reading from internal zip file")
 		return nil, err
 	}
-	logrus.Errorln("Doc:", string(filebytes))
+	logrus.Debug("Doc:", string(filebytes))
 
 	doc := Document{
 		XMLW:    XMLNS_W,
@@ -95,7 +95,7 @@ func processRelations(file *zip.File) (*Relationships, error) {
 		logrus.Errorln("Error reading from internal zip file")
 		return nil, err
 	}
-	logrus.Errorln("Relations:", string(filebytes))
+	logrus.Debug("Relations:", string(filebytes))
 
 	rels := Relationships{Xmlns: XMLNS_R}
 	err = xml.Unmarshal(filebytes, &rels)
